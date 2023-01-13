@@ -7,6 +7,7 @@ const server = http.createServer((req, res) => {
     index: 'html',
     '/about': 'html',
     '/contact-me': 'html',
+    '/404': 'html',
   };
 
   const contentType = {
@@ -24,15 +25,30 @@ const server = http.createServer((req, res) => {
   const page = req.url === '/' ? 'index' : req.url;
   const url = path.join(__dirname, 'public', `${page}.${fileExtension[page]}`);
 
-  fs.readFile(url, 'utf-8', (err, content) => {
-    if (err) {
-      //TODO: handle 404 and 500 here
-      throw err;
+  const handleErr = (err) => {
+    if (err.code === 'ENOENT') {
+      const url = path.join(__dirname, 'public', '404.html');
+      loadPage(url);
+    } else {
+      res.writeHead(500);
+      res.end(`Server Error: ${err.code}`);
     }
-    res.writeHead(200, { 'Content-Type': contentType[path.extname(url)] });
-    res.write(content);
-    res.end();
-  });
+  };
+
+  const loadPage = (url) => {
+    fs.readFile(url, 'utf-8', (err, content) => {
+      if (err) {
+        //TODO: handle 404 and 500 here
+        handleErr(err);
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': contentType[path.extname(url)] });
+      res.write(content);
+      res.end();
+    });
+  };
+
+  loadPage(url);
 });
 
 const PORT = 8080;
