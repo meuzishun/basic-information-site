@@ -35,16 +35,19 @@ const server = http.createServer((req, res) => {
     }
   };
 
+  const sendContent = (url, content) => {
+    res.writeHead(200, { 'Content-Type': contentType[path.extname(url)] });
+    res.write(content);
+    res.end();
+  };
+
   const loadPage = (url) => {
     fs.readFile(url, 'utf-8', (err, content) => {
       if (err) {
-        //TODO: handle 404 and 500 here
         handleErr(err);
-        return;
+      } else {
+        sendContent(url, content);
       }
-      res.writeHead(200, { 'Content-Type': contentType[path.extname(url)] });
-      res.write(content);
-      res.end();
     });
   };
 
