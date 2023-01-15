@@ -23,7 +23,10 @@ const server = http.createServer((req, res) => {
   if (path.extname(req.url) === '.ico') return;
 
   const page = req.url === '/' ? 'index' : req.url;
-  const url = path.join(__dirname, 'public', `${page}.${fileExtension[page]}`);
+  const url =
+    path.extname(page) !== ''
+      ? path.join(__dirname, 'public', page)
+      : path.join(__dirname, 'public', `${page}.${fileExtension[page]}`);
 
   const handleErr = (err) => {
     if (err.code === 'ENOENT') {
