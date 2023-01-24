@@ -45,7 +45,9 @@ const server = http.createServer((req, res) => {
   };
 
   const loadPage = (url) => {
-    fs.readFile(url, 'utf-8', (err, content) => {
+    const textExtension = ['.html', '.css']; //* add more extensions if needed
+    const encoding = textExtension.includes(path.extname(url)) ? 'utf-8' : null;
+    fs.readFile(url, encoding, (err, content) => {
       if (err) {
         handleErr(err);
       } else {
